@@ -1,0 +1,9 @@
+- name: Reset SSH Connection
+  listen: packages_docker:group
+  ansible.builtin.meta: reset_connection
+
+- name: Restart Docker
+  listen: packages_docker:config
+  ansible.builtin.systemd_service:
+    state: restarted
+    name: docker

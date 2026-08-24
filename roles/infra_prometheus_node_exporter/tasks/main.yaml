@@ -1,0 +1,45 @@
+- name: Download Target Version
+  delegate_to: localhost
+  ansible.builtin.get_url:
+      url: "{{ infra_prometheus_node_exporter_url }}"
+      dest: "{{ infra_prometheus_node_exporter_archive_path }}"
+      mode: "0644"
+      checksum: "sha256:https://github.com/prometheus/node_exporter/releases/download/v{{ infra_prometheus_node_exporter_version }}/sha256sums.txt"
+
+- name: Ensure Node Exporter Binary Installed
+  become: true
+  ansible.builtin.unarchive:
+      src: "{{ infra_prometheus_node_exporter_archive_path }}"
+      dest: /usr/local/bin/
+      include:
+          - node_exporter-{{ infra_prometheus_node_exporter_version }}.linux-amd64/node_exporter
+      extra_opts:
+          - --strip-components=1
+
+- name: Check Installed Version
+  become: true
+  changed_when: false
+  register: __check_version_output
+  ansible.builtin.command:
+      argv:
+          - /usr/local/bin/node_exporter
+          - --version
+
+- name: Assert Installed Version Matches
+  ansible.builtin.assert:
+      that: __check_version_output.stdout_lines.0.startswith("node_exporter, version {0}".format(infra_prometheus_node_exporter_version))
+
+- name: Install Systemd Unit
+  become: true
+  ansible.builtin.template:
+      src: exporter.service.j2
+      dest: /etc/systemd/system/prometheus-node-exporter.service
+      mode: "0644"
+
+- name: Ensure Node Exporter Service Started
+  become: true
+  ansible.builtin.systemd_service:
+      state: started
+      name: prometheus-node-exporter
+      enabled: true
+      daemon_reload: true

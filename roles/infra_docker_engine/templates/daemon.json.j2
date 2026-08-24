@@ -1,0 +1,6 @@
+{% set config | from_yaml %}
+log-driver: journald
+max-concurrent-downloads: 2
+insecure-registries: ["{{ vars_group_homelab_nodes__registry_url }}"]
+{% endset %}
+{{- config | to_json -}}

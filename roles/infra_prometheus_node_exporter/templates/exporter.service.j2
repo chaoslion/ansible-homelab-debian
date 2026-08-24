@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/node_exporter --web.disable-exporter-metrics
+
+[Install]
+WantedBy=multi-user.target

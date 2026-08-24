@@ -1,0 +1,24 @@
+- name: Restart Service
+  listen: "infra_journald_retention:config"
+  become: true
+  ansible.builtin.systemd_service:
+    state: restarted
+    name: systemd-journald
+
+- name: Run Journald Flush
+  changed_when: true
+  listen: "infra_journald_retention:config"
+  become: true
+  ansible.builtin.command:
+    argv:
+      - journalctl
+      - --flush
+
+- name: Run Journald Vacuum 1 Day
+  changed_when: true
+  listen: "infra_journald_retention:config"
+  become: true
+  ansible.builtin.command:
+    argv:
+      - journalctl
+      - --vacuum-time=1d

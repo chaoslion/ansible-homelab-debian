@@ -1,0 +1,3 @@
+infra_prometheus_node_exporter_version: 1.12.1
+infra_prometheus_node_exporter_archive_path: "{{ lookup('env', 'PWD') }}/cache/prometheus-node-exporter.tar.gz"
+infra_prometheus_node_exporter_url: https://github.com/prometheus/node_exporter/releases/download/v{{ infra_prometheus_node_exporter_version }}/node_exporter-{{ infra_prometheus_node_exporter_version }}.linux-amd64.tar.gz
